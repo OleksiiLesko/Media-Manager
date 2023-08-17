@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Service", "MediaManager.Service\MediaManager.Service.csproj", "{E55A3579-AFB0-4861-ABA1-3228C36846CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Worker", "MediaManager.Worker\MediaManager.Worker.csproj", "{EF9BC59A-A52B-4156-9923-AC3B39C9642C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Debug|x64.ActiveCfg = Debug|x64
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Debug|x64.Build.0 = Debug|x64
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Release|x64.ActiveCfg = Release|x64
+		{E55A3579-AFB0-4861-ABA1-3228C36846CF}.Release|x64.Build.0 = Release|x64
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Debug|x64.Build.0 = Debug|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|x64.ActiveCfg = Release|Any CPU
+		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {131A2439-562E-4D19-AC90-8CE52D169F9B}
+	EndGlobalSection
+EndGlobal
