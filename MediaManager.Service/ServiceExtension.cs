@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace MediaManager.Service
 {
     /// <summary>
-    /// Class for run project as service
+    /// Provides extension method for running a host as a Windows service.
     /// </summary>
     public static class ServiceExtensions
     {
         /// <summary>
-        /// Run media-manager service 
+        /// Runs the specified host as a Windows service.
         /// </summary>
-        /// <param name="host"></param>
+        /// <param name="host">The host to run as a service.</param>
         public static void RunAsService(this IHost host)
         {
-            var hostService = new ManagerService(host);
+            var hostService = new MediaManagerService(host);
             ServiceBase.Run(hostService);
         }
     }
