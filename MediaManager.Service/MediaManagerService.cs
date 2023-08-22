@@ -1,40 +1,27 @@
-﻿using Google;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MediaManager.Service
 {
     /// <summary>
-    /// Represents the Windows service 
+    /// Represents a service that running as a windows service
     /// </summary>
-    public class ManagerService : ServiceBase
+    public class MediaManagerService : ServiceBase
     {
-        /// <summary>
-        /// Logger
-        /// </summary>
-        private readonly ILogger<ManagerService> _logger;
-        /// <summary>
-        /// Host
-        /// </summary>
+        private readonly ILogger<MediaManagerService> _logger;
+ 
         private readonly IHost _host;
-        /// <summary>
-        /// Cancellation Token Source
-        /// </summary>
+
         private readonly CancellationTokenSource _stopHostToken;
 
         /// <summary>
-        /// Settings for library service with host 
+        ///Initializes a new instance of the MediaManagerService
         /// </summary>
         /// <param name="host"></param>
-        public ManagerService(IHost host)
+        public MediaManagerService(IHost host)
         {
             ILoggerFactory? loggerFactory = (ILoggerFactory?)host.Services.GetService(typeof(ILoggerFactory));
-            _logger = loggerFactory?.CreateLogger<ManagerService>() ?? NullLogger<ManagerService>.Instance;
+            _logger = loggerFactory?.CreateLogger<MediaManagerService>() ?? NullLogger<MediaManagerService>.Instance;
             _host = host;
             _stopHostToken = new CancellationTokenSource();
         }
@@ -50,6 +37,7 @@ namespace MediaManager.Service
             {
                 try
                 {
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                     await _host.RunAsync(_stopHostToken.Token);
                 }
                 catch (Exception e)
