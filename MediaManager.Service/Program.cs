@@ -1,3 +1,4 @@
+using MediaManager.RabbitMQClient;
 using MediaManager.Worker;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -22,7 +23,6 @@ namespace MediaManager.Service
             Directory.SetCurrentDirectory(pathToContentRoot!);
             try
             {
-                Log.Information("Starting up...");
                 ConfigureLogger();
 
                 IHost host = CreateHostBuilder(args).Build();
@@ -77,7 +77,8 @@ namespace MediaManager.Service
                 })
                  .ConfigureServices(services =>
                  {
-                     services.AddHostedService<MediaWorker>();
+                     services.AddHostedService<MediaManagerWorker>();
+                     services.AddSingleton<IRabbitMQService, RabbitMQService>();
                  })
                 .UseSerilog();
         }
