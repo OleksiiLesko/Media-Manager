@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Service", "Med
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Worker", "MediaManager.Worker\MediaManager.Worker.csproj", "{EF9BC59A-A52B-4156-9923-AC3B39C9642C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.RabbitMQClient", "MediaManager.RabbitMQClient\MediaManager.RabbitMQClient.csproj", "{490BC7F2-766F-45DF-8C7C-023B976F1E56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|x64.ActiveCfg = Release|Any CPU
 		{EF9BC59A-A52B-4156-9923-AC3B39C9642C}.Release|x64.Build.0 = Release|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Debug|x64.Build.0 = Debug|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Release|x64.ActiveCfg = Release|Any CPU
+		{490BC7F2-766F-45DF-8C7C-023B976F1E56}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
