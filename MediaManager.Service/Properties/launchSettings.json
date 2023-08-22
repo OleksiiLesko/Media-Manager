@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "Media_Manager.Manager": {
+    "MediaManager.Service": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
