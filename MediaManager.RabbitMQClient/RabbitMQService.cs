@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MediaManager.Domain.DTOs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Reflection;
 using System.Text;
 
 namespace MediaManager.RabbitMQClient
@@ -41,19 +44,20 @@ namespace MediaManager.RabbitMQClient
         /// <summary>
         /// Receiving messages from RabbitMQ.
         /// </summary>
-        public void ReceiveMessage(IModel channel, Action<string> messageHandler)
+        public void ReceiveMessage(IModel channel, Action<string, ulong> messageHandler)
         {
             _logger.LogInformation("Starting RabbitMQ message receive:");
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
+                var deliveryTag = ea.DeliveryTag;
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
                 var copiedMessage = message;
-                messageHandler?.Invoke(copiedMessage);
-                AcknowledgeMessage(channel, ea.DeliveryTag);
+                messageHandler?.Invoke(copiedMessage, deliveryTag);
+               
             };
 
             channel.BasicConsume(queue: _configuration["RabbitMQ:CallEventQueue"], autoAck: false, consumer: consumer);
@@ -63,9 +67,10 @@ namespace MediaManager.RabbitMQClient
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="deliveryTag"></param>
-        private void AcknowledgeMessage(IModel channel, ulong deliveryTag)
+        public void AcknowledgeMessage(IModel channel, ulong deliveryTag)
         {
             channel.BasicAck(deliveryTag, multiple: false);
         }
+
     }
 }
