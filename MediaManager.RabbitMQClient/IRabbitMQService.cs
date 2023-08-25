@@ -10,11 +10,17 @@ namespace MediaManager.RabbitMQClient
         /// <summary>
         /// Starts receiving messages from RabbitMQ.
         /// </summary>
-        void ReceiveMessage(IModel channel,Action<string> messageHandler);
+        void ReceiveMessage(IModel channel, Action<string, ulong> messageHandler);
         /// <summary>
         /// Creates and manages the RabbitMQ connection.
         /// </summary>
         /// <returns></returns>
         IConnection Connect();
+        /// <summary>
+        /// Sends acknowledgment for a successfully processed message.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="deliveryTag"></param>
+        void AcknowledgeMessage(IModel channel, ulong deliveryTag);
     }
 }
