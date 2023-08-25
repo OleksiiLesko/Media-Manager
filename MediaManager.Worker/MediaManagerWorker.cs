@@ -1,7 +1,11 @@
+using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
+using Serilog;
+using System;
 
 namespace MediaManager.Worker
 {
@@ -32,12 +36,16 @@ namespace MediaManager.Worker
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Action<string> messageHandler = (message) =>
+            Action<string, ulong> messageHandler = (message, deliveryTag) =>
             {
-                _logger.LogInformation("Received message : {message}", message);
+                CallEvent receivedCallEvent = JsonConvert.DeserializeObject<CallEvent>(message);
+
+                _rabbitMQService.AcknowledgeMessage(_rabbitChannel, deliveryTag);
+                _logger.LogInformation("Received a message: {@CallEvent}", receivedCallEvent);
             };
+
             _rabbitMQService.ReceiveMessage(_rabbitChannel, messageHandler);
-            await Task.Delay(5000, stoppingToken);
+
         }
     }
 }
