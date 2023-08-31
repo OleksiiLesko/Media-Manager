@@ -44,8 +44,16 @@ namespace MediaManager.Worker
                 _logger.LogInformation("Received a message: {@CallEvent}", receivedCallEvent);
             };
 
-            _rabbitMQService.ReceiveMessage(_rabbitChannel, messageHandler);
-
+            await Task.Run(() => _rabbitMQService.ReceiveMessage(_rabbitChannel, messageHandler));
+        }
+        /// <summary>
+        /// Calls ExecuteAsync
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task StartProcessing(CancellationToken cancellationToken)
+        {
+            await ExecuteAsync(cancellationToken);
         }
     }
 }
