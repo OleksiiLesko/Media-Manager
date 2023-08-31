@@ -1,10 +1,7 @@
-﻿using MediaManager.Domain.DTOs;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Reflection;
 using System.Text;
 
 namespace MediaManager.RabbitMQClient
