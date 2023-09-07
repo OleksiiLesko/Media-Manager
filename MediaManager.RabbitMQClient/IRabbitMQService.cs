@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using MediaManager.Domain.DTOs;
+using RabbitMQ.Client;
 
 namespace MediaManager.RabbitMQClient
 {

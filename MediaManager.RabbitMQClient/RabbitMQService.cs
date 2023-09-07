@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MediaManager.Domain.DTOs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Data;
 using System.Text;
 
 namespace MediaManager.RabbitMQClient
@@ -68,6 +70,5 @@ namespace MediaManager.RabbitMQClient
         {
             channel.BasicAck(deliveryTag, multiple: false);
         }
-
     }
 }
