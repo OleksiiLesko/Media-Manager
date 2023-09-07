@@ -56,15 +56,6 @@ namespace MediaManager.Worker
             _eventArchiver.ArchiveCallEventAsync(receivedCallEvent);
             _logger.LogInformation("Received a message: {@CallEvent}", receivedCallEvent);
         }
-        /// <summary>
-        /// Calls ExecuteAsync
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task StartProcessing(CancellationToken cancellationToken)
-        {
-            await ExecuteAsync(cancellationToken);
-        }
 
     }
 }
