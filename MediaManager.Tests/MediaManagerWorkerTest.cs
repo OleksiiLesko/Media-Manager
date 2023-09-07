@@ -17,6 +17,7 @@ namespace MediaManager.Tests
         private readonly Mock<IRabbitMQService> _rabbitMQServiceMock;
         private readonly Mock<IConnection> _rabbitConnectionMock;
         private readonly Mock<IModel> _rabbitChannelMock;
+        private readonly Mock<IArchiveManager> _eventArchiverMock;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CallEvent _callEvent;
 
@@ -26,6 +27,7 @@ namespace MediaManager.Tests
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _rabbitConnectionMock = new Mock<IConnection>();
             _rabbitChannelMock = new Mock<IModel>();
+            _eventArchiverMock = new Mock<IArchiveManager>();
             _cancellationTokenSource = new CancellationTokenSource();
             _callEvent = new CallEvent();
         }
@@ -37,7 +39,7 @@ namespace MediaManager.Tests
             _rabbitMQServiceMock.Setup(x => x.Connect()).Returns(_rabbitConnectionMock.Object);
             _rabbitConnectionMock.Setup(x => x.CreateModel()).Returns(_rabbitChannelMock.Object);
 
-            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object);
+            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object,_eventArchiverMock.Object);
 
             var jsonMessage = JsonConvert.SerializeObject(_callEvent);
             var messageBody = Encoding.UTF8.GetBytes(jsonMessage);
