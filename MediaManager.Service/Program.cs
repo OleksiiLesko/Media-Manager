@@ -79,6 +79,7 @@ namespace MediaManager.Service
                  {
                      services.AddHostedService<MediaManagerWorker>();
                      services.AddSingleton<IRabbitMQService, RabbitMQService>();
+                     services.AddSingleton<IArchiveManager, ArchiveManager>();
                  })
                 .UseSerilog();
         }
