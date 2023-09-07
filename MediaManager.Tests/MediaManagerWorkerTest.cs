@@ -2,12 +2,14 @@ using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 using Moq;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace MediaManager.Tests
 {
@@ -20,8 +22,7 @@ namespace MediaManager.Tests
         private readonly Mock<IArchiveManager> _eventArchiverMock;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CallEvent _callEvent;
-
-       public MediaManagerWorkerTest()
+        public MediaManagerWorkerTest()
         {
             _loggerMock = new Mock<ILogger<MediaManagerWorker>>();
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
@@ -32,14 +33,14 @@ namespace MediaManager.Tests
             _callEvent = new CallEvent();
         }
         [Fact]
-        public async Task ExecuteAsync_Should_Handle_Message_And_Acknowledge()
+        public async Task ExecuteAsync_Should_Recieve_Message()
         {
             var stoppingToken = _cancellationTokenSource.Token;
 
             _rabbitMQServiceMock.Setup(x => x.Connect()).Returns(_rabbitConnectionMock.Object);
             _rabbitConnectionMock.Setup(x => x.CreateModel()).Returns(_rabbitChannelMock.Object);
 
-            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object,_eventArchiverMock.Object);
+            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object);
 
             var jsonMessage = JsonConvert.SerializeObject(_callEvent);
             var messageBody = Encoding.UTF8.GetBytes(jsonMessage);
@@ -51,11 +52,11 @@ namespace MediaManager.Tests
                                 capturedHandler = handler;
                             });
 
-            await worker.StartProcessing(stoppingToken);
+           await worker.StartAsync(stoppingToken);
 
             capturedHandler?.Invoke(jsonMessage, 1);
 
-            _rabbitMQServiceMock.Verify(x => x.AcknowledgeMessage(_rabbitChannelMock.Object, 1), Times.Once);
+            _rabbitMQServiceMock.Verify(x => x.ReceiveMessage(It.IsAny<IModel>(), It.IsAny<Action<string, ulong>>()), Times.Once);
         }
     }
-}
+}  
