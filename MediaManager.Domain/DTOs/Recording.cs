@@ -16,3 +16,4 @@ namespace MediaManager.Domain.DTOs
         public string RecordedFilePath { get; set; }
     }
 }
+
