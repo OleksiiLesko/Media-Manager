@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Common", "Medi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Domain", "MediaManager.Domain\MediaManager.Domain.csproj", "{54F5E666-DF9A-4CB6-B67D-AD16C4015D11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Tests", "MediaManager.Tests\MediaManager.Tests.csproj", "{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Tests", "MediaManager.Tests\MediaManager.Tests.csproj", "{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Repository", "MediaManager.Repository\MediaManager.Repository.csproj", "{C413BCB9-5B8E-4FA5-91A2-D53964D63278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}.Release|x64.ActiveCfg = Release|Any CPU
 		{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}.Release|x64.Build.0 = Release|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Debug|x64.Build.0 = Debug|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Release|x64.ActiveCfg = Release|Any CPU
+		{C413BCB9-5B8E-4FA5-91A2-D53964D63278}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
