@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Domain", "Medi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Tests", "MediaManager.Tests\MediaManager.Tests.csproj", "{8C7412D5-382B-4D97-A8DA-3F4AFD6BFF76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaManager.Repository", "MediaManager.Repository\MediaManager.Repository.csproj", "{C413BCB9-5B8E-4FA5-91A2-D53964D63278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaManager.Repositories", "MediaManager.Repository\MediaManager.Repositories.csproj", "{C413BCB9-5B8E-4FA5-91A2-D53964D63278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
