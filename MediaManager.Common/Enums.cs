@@ -5,7 +5,7 @@
     /// </summary>
     public enum CallDirection
     {
-        Unknown,
+        Unknown = 1,
         Incoming,
         Outcoming,
         Internal
@@ -15,7 +15,7 @@
     /// </summary>
     public enum MediaType
     {
-        Voice,
+        Voice = 1,
         Screen
     }
     /// <summary>
@@ -23,8 +23,18 @@
     /// </summary>
     public enum RecordingStatus
     {
-        None, 
+        None = 1, 
         Recorded, 
         NotRecorded
+    }
+    /// <summary>
+    /// Enumeration for call event recording status
+    /// </summary>
+    public enum ArchivingStatus
+    {
+        GoingToArchive = 1,
+        Archived,
+        FailedToArchive,
+        Deleted
     }
 }
