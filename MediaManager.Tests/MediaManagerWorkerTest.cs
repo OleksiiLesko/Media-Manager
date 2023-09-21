@@ -1,5 +1,6 @@
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
+using MediaManager.Repositories;
 using MediaManager.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
@@ -20,6 +21,7 @@ namespace MediaManager.Tests
         private readonly Mock<IConnection> _rabbitConnectionMock;
         private readonly Mock<IModel> _rabbitChannelMock;
         private readonly Mock<IArchiveManager> _eventArchiverMock;
+        private readonly Mock<IRepository> _repositoryMock;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CallEvent _callEvent;
         public MediaManagerWorkerTest()
@@ -29,6 +31,7 @@ namespace MediaManager.Tests
             _rabbitConnectionMock = new Mock<IConnection>();
             _rabbitChannelMock = new Mock<IModel>();
             _eventArchiverMock = new Mock<IArchiveManager>();
+            _repositoryMock = new Mock<IRepository>();
             _cancellationTokenSource = new CancellationTokenSource();
             _callEvent = new CallEvent();
         }
@@ -40,7 +43,7 @@ namespace MediaManager.Tests
             _rabbitMQServiceMock.Setup(x => x.Connect()).Returns(_rabbitConnectionMock.Object);
             _rabbitConnectionMock.Setup(x => x.CreateModel()).Returns(_rabbitChannelMock.Object);
 
-            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object);
+            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object, _repositoryMock.Object);
 
             var jsonMessage = JsonConvert.SerializeObject(_callEvent);
             var messageBody = Encoding.UTF8.GetBytes(jsonMessage);
