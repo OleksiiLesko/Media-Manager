@@ -48,13 +48,13 @@ GO
 
 INSERT INTO ArchivingStatus (ArchivingStatusId, ArchivingStatusType)
 VALUES
-    (1, 'Archived'),
-    (2, 'NotArchived'),
+    (1, 'GoingToArchive'),
+    (2, 'Archived'),
     (3, 'FailedToArchive'),
     (4, 'Deleted');
 
 CREATE TABLE CallEvent(
-    CallId INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    CallId INT  PRIMARY KEY NOT NULL,
     CallStartTime DateTime,
     CallEndTime DateTime,
     CallDirection SMALLINT,
@@ -70,7 +70,7 @@ CREATE TABLE Recording(
     EndTime DateTime,
     MediaType SMALLINT,
     RecordingStatus SMALLINT,
-    RecordedFilePath VARCHAR(50),
+    ArchivingFilePath VARCHAR(200),
     ArchivingDate DateTime,
     ArchivingStatus SMALLINT,
   CONSTRAINT FK_Recording_ArchivingStatus FOREIGN KEY (ArchivingStatus) REFERENCES ArchivingStatus(ArchivingStatusId),
