@@ -1,4 +1,5 @@
 using MediaManager.RabbitMQClient;
+using MediaManager.Repositories;
 using MediaManager.Worker;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -80,6 +81,7 @@ namespace MediaManager.Service
                      services.AddHostedService<MediaManagerWorker>();
                      services.AddSingleton<IRabbitMQService, RabbitMQService>();
                      services.AddSingleton<IArchiveManager, ArchiveManager>();
+                     services.AddSingleton<IRepository, Repository>();
                  })
                 .UseSerilog();
         }
