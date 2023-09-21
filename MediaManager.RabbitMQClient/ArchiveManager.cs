@@ -1,4 +1,6 @@
-﻿using MediaManager.Domain.DTOs;
+﻿using MediaManager.Common;
+using MediaManager.Domain.DTOs;
+using MediaManager.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -11,16 +13,18 @@ namespace MediaManager.RabbitMQClient
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<ArchiveManager> _logger;
+        private readonly IRepository _repository;
 
         /// <summary>
         /// Initializes a new instance of the EventArchiver class.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger)
+        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger, IRepository repository)
         {
             _configuration = configuration;
             _logger = logger;
+            _repository = repository;
         }
         /// <summary>
         /// Copies recording file  to a specified file path.
@@ -39,14 +43,15 @@ namespace MediaManager.RabbitMQClient
             {
                 var sourceFilePath = recording.RecordedFilePath;
                 var destinationFilePath = Path.Combine(archivePath, Path.GetFileName(sourceFilePath));
-
                 try
                 {
-                    File.Copy(sourceFilePath, destinationFilePath, true);
+                     File.Copy(sourceFilePath, destinationFilePath, true);
+                    _repository.SetArchivingStatus(callEvent, destinationFilePath, ArchivingStatus.Archived);
                     _logger.LogInformation("Recording copied to archive: {SourceFilePath} -> {DestinationFilePath}", sourceFilePath, destinationFilePath);
                 }
                 catch (Exception ex)
                 {
+                    _repository.SetArchivingStatus(callEvent, null, ArchivingStatus.FailedToArchive);
                     _logger.LogError("Error copying recording: {SourceFilePath} -> {DestinationFilePath}. Error: {ErrorMessage}", sourceFilePath, destinationFilePath, ex.Message);
                 }
             }
@@ -56,7 +61,7 @@ namespace MediaManager.RabbitMQClient
         /// </summary>
         /// <param name="callEvent"></param>
         /// <returns></returns>
-        private string GetArchivePath(CallEvent callEvent)
+        public string GetArchivePath(CallEvent callEvent)
         {
             var archivePathTemplate = _configuration["ArchiveEventsPath"];
             var date = callEvent.CallEndTime.ToString("dd-MM-yyyy");
