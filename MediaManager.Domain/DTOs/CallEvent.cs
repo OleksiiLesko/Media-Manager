@@ -7,7 +7,7 @@ namespace MediaManager.Domain.DTOs
     /// </summary>
     public class CallEvent
     {
-        public int? CallId { get; set; }
+        public int CallId { get; set; }
         public DateTime CallStartTime { get; set; }
         public DateTime CallEndTime { get; set; }
         public CallDirection CallDirection { get; set; }
