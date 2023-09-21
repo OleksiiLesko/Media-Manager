@@ -7,13 +7,16 @@ namespace MediaManager.Domain.DTOs
     /// </summary>
     public class Recording
     {
-        public int? RecordingId { get; set; }
-        public int? RecorderId { get; set; }
+        public int RecordingId { get; set; }
+        public int RecorderId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public MediaType MediaType { get; set; }
         public RecordingStatus RecordingStatus { get; set; }
         public string RecordedFilePath { get; set; }
+        public DateTime ArchivingDate { get; set; }
+        public string ArchivingFilePath { get; set; }
+        public ArchivingStatus ArchivingStatus { get; set; }
     }
 }
 
