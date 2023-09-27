@@ -2,6 +2,7 @@
 using MediaManager.Domain.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -15,7 +16,6 @@ namespace MediaManager.Repositories
         private readonly IConfiguration _configuration;
         private readonly ILogger<Repository> _logger;
         /// <summary>
-        /// 
         /// Initializes a new instance of the DbConfiguration
         /// </summary>
         /// <param name="configuration"></param>
@@ -52,7 +52,6 @@ namespace MediaManager.Repositories
             using (var connection = new SqlConnection(CreateConnectionString()))
             {
                 connection.Open();
-
                 using (var callEventCmd = new SqlCommand("INSERT INTO CallEvent (CallId, CallStartTime, CallEndTime, CallDirection) VALUES (@CallId, @StartTime, @EndTime, @CallDirection);", connection))
                 {
                     callEventCmd.Parameters.AddWithValue("@CallId", callEvent.CallId);
@@ -89,6 +88,7 @@ namespace MediaManager.Repositories
 
                     recordingCmd.CommandText += valuesPlaceholder.ToString();
                     recordingCmd.ExecuteNonQuery();
+                    _logger.LogInformation($"Saved call event {callEvent.CallId} to the database.");
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace MediaManager.Repositories
         /// Sets status archiving of recording 
         /// </summary>
         /// <param name="callEvent"></param>
-        public void SetArchivingStatus(CallEvent callEvent, string archivingFilePath,ArchivingStatus archivingStatus)
+        public void SetArchivingStatus(CallEvent callEvent, string? archivingFilePath,ArchivingStatus archivingStatus)
         {
             using (var connection = new SqlConnection(CreateConnectionString()))
             {
@@ -113,7 +113,8 @@ namespace MediaManager.Repositories
                             recordingCmd.Parameters.AddWithValue("@RecordingId", recording.RecordingId);
 
                             recordingCmd.ExecuteNonQuery();
-                        }
+                        _logger.LogInformation($"Updated call event archiving status of recording {recording.RecordingId} in the database.");
+                    }
                 }
 
                 connection.Close();
