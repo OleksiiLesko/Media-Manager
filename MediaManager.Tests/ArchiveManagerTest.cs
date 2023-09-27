@@ -1,57 +1,77 @@
-﻿using MediaManager.Domain.DTOs;
+﻿using MediaManager.Common;
+using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
+using MediaManager.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.IO;
-using System.IO.Abstractions;
 
 namespace MediaManager.Tests
 {
     public class ArchiveManagerTest
     {
-        private readonly Mock<IConfiguration> _configuration;
+        readonly Mock<IConfiguration> _configuration;
         private readonly Mock<ILogger<ArchiveManager>> _loggerMock;
-        private readonly CallEvent _callEvent;
+        private readonly Mock<IRepository> _repositoryMock;
         public ArchiveManagerTest()
         {
             _configuration = new Mock<IConfiguration>();
             _loggerMock = new Mock<ILogger<ArchiveManager>>();
-            _callEvent = new CallEvent();
+            _repositoryMock = new Mock<IRepository>();
         }
         [Fact]
-        public async Task ArchiveCallEventAsync_SuccessfulCopy()
+        public async Task ArchiveCallEventAsync_CopiesRecordingsAndSetsArchivingStatus()
         {
-            _configuration.Setup(x => x["ArchiveEventsPath"]).Returns("source_file_path");
+            _configuration.Setup(c => c["ArchiveEventsPath"]).Returns("test-archive-path");
 
-            var archiveManager = new ArchiveManager(_configuration.Object, _loggerMock.Object);
+            _repositoryMock.Setup(r => r.SetArchivingStatus(It.IsAny<CallEvent>(), It.IsAny<string>(), It.IsAny<ArchivingStatus>()));
 
             var callEvent = new CallEvent
             {
                 CallId = 1,
-                CallEndTime = DateTime.Now,
+                CallStartTime = DateTime.UtcNow,
+                CallEndTime = DateTime.UtcNow,
                 Recordings = new List<Recording>
                 {
                     new Recording
                     {
-                        RecordedFilePath = "source_file_path"
+                        RecordedFilePath = "C:\\Users\\olesko\\source\\Recordings\\Recording1.txt"
                     }
                 }
             };
 
+            var archiveManager = new ArchiveManager(_configuration.Object, _loggerMock.Object, _repositoryMock.Object);
+
             await archiveManager.ArchiveCallEventAsync(callEvent);
 
-            _configuration.Verify(x => x["ArchiveEventsPath"], Times.Once);
+            _repositoryMock.Verify(r => r.SetArchivingStatus(callEvent, It.IsAny<string>(), ArchivingStatus.Archived), Times.Once);
         }
         [Fact]
-        public async Task ArchiveCallEventAsync_CopyError()
+        public async Task ArchiveCallEventAsync_HandlesExceptionAndSetsFailedArchivingStatus()
         {
-            var configurationMock = new Mock<IConfiguration>();
-            configurationMock.Setup(x => x["ArchiveEventsPath"]).Returns("test_archive_path");
+            _configuration.Setup(c => c["ArchiveEventsPath"]).Returns("test-archive-path");
 
-            var archiveManager = new ArchiveManager(configurationMock.Object, _loggerMock.Object);
+            _repositoryMock.Setup(r => r.SetArchivingStatus(It.IsAny<CallEvent>(), It.IsAny<string>(), ArchivingStatus.FailedToArchive));
 
-            await Assert.ThrowsAsync<NullReferenceException>(async () => await archiveManager.ArchiveCallEventAsync(_callEvent));
+            var callEvent = new CallEvent
+            {
+                CallId = 1,
+                CallStartTime = DateTime.UtcNow,
+                CallEndTime = DateTime.UtcNow,
+                Recordings = new List<Recording>
+                {
+                    new Recording
+                    {
+                        RecordedFilePath = "invalid-destination-path"
+                    }
+                }
+            };
+
+            var archiveManager = new ArchiveManager(_configuration.Object, _loggerMock.Object, _repositoryMock.Object);
+
+            await archiveManager.ArchiveCallEventAsync(callEvent);
+
+            _repositoryMock.Verify(r => r.SetArchivingStatus(callEvent, It.IsAny<string>(), ArchivingStatus.FailedToArchive), Times.Once);
         }
     }
 }
