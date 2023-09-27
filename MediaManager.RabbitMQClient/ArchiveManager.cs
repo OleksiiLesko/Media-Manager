@@ -51,7 +51,8 @@ namespace MediaManager.RabbitMQClient
                 }
                 catch (Exception ex)
                 {
-                    _repository.SetArchivingStatus(callEvent, null, ArchivingStatus.FailedToArchive);
+                    string? archivingFilePath = null; 
+                    _repository.SetArchivingStatus(callEvent, archivingFilePath, ArchivingStatus.FailedToArchive);
                     _logger.LogError("Error copying recording: {SourceFilePath} -> {DestinationFilePath}. Error: {ErrorMessage}", sourceFilePath, destinationFilePath, ex.Message);
                 }
             }
@@ -61,7 +62,7 @@ namespace MediaManager.RabbitMQClient
         /// </summary>
         /// <param name="callEvent"></param>
         /// <returns></returns>
-        public string GetArchivePath(CallEvent callEvent)
+        private string GetArchivePath(CallEvent callEvent)
         {
             var archivePathTemplate = _configuration["ArchiveEventsPath"];
             var date = callEvent.CallEndTime.ToString("dd-MM-yyyy");
