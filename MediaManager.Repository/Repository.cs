@@ -15,11 +15,11 @@ namespace MediaManager.Repositories
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<Repository> _logger;
-        /// <summary>
-        /// Initializes a new instance of the DbConfiguration
-        /// </summary>
-        /// <param name="configuration"></param>
-        public Repository(IConfiguration configuration, ILogger<Repository> logger)
+       /// <summary>
+       /// Initializes a new instance of the DbConfiguration
+       /// </summary>
+       /// <param name="configuration"></param>
+       public Repository(IConfiguration configuration, ILogger<Repository> logger)
         {
             _configuration = configuration;
             _logger = logger;
@@ -90,36 +90,39 @@ namespace MediaManager.Repositories
                     recordingCmd.ExecuteNonQuery();
                     _logger.LogInformation($"Saved call event {callEvent.CallId} to the database.");
                 }
+                connection.Close();
             }
         }
         /// <summary>
         /// Sets status archiving of recording 
         /// </summary>
         /// <param name="callEvent"></param>
-        public void SetArchivingStatus(CallEvent callEvent, string? archivingFilePath,ArchivingStatus archivingStatus)
+        public void SetCallArchivingStatusToDatabse(CallEvent callEvent, string archivingFilePath, ArchivingStatus archivingStatus)
+        
         {
+
             using (var connection = new SqlConnection(CreateConnectionString()))
             {
-                connection.Open();
+
+                 connection.Open();
 
                 foreach (var recording in callEvent.Recordings)
                 {
                     using (var recordingCmd = new SqlCommand("UPDATE Recording SET ArchivingStatus = @ArchivingStatus, ArchivingFilePath = @ArchivingFilePath, ArchivingDate = @ArchivingDate WHERE CallId = @CallId AND RecordingId = @RecordingId;", connection))
-                        {
-                            recordingCmd.Parameters.AddWithValue("@ArchivingStatus", archivingStatus);
-                            recordingCmd.Parameters.AddWithValue("@ArchivingFilePath", archivingFilePath);
-                            recordingCmd.Parameters.AddWithValue("@ArchivingDate", recording.EndTime);
-                            recordingCmd.Parameters.AddWithValue("@CallId", callEvent.CallId);
-                            recordingCmd.Parameters.AddWithValue("@RecordingId", recording.RecordingId);
+                    {
+                        recordingCmd.Parameters.AddWithValue("@ArchivingDate", recording.EndTime);
+                        recordingCmd.Parameters.AddWithValue("@ArchivingFilePath", archivingFilePath);
+                        recordingCmd.Parameters.AddWithValue("@ArchivingStatus", archivingStatus);
+                        recordingCmd.Parameters.AddWithValue("@CallId", callEvent.CallId);
+                        recordingCmd.Parameters.AddWithValue("@RecordingId", recording.RecordingId);
 
-                            recordingCmd.ExecuteNonQuery();
+                         recordingCmd.ExecuteNonQuery();
                         _logger.LogInformation($"Updated call event archiving status of recording {recording.RecordingId} in the database.");
                     }
                 }
 
                 connection.Close();
             }
-
         }
     }
 }

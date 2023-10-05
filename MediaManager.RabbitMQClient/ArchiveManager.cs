@@ -15,12 +15,12 @@ namespace MediaManager.RabbitMQClient
         private readonly ILogger<ArchiveManager> _logger;
         private readonly IRepository _repository;
 
-        /// <summary>
+       /// <summary>
         /// Initializes a new instance of the EventArchiver class.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger, IRepository repository)
+        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger,IRepository repository)
         {
             _configuration = configuration;
             _logger = logger;
@@ -45,14 +45,14 @@ namespace MediaManager.RabbitMQClient
                 var destinationFilePath = Path.Combine(archivePath, Path.GetFileName(sourceFilePath));
                 try
                 {
-                     File.Copy(sourceFilePath, destinationFilePath, true);
-                    _repository.SetArchivingStatus(callEvent, destinationFilePath, ArchivingStatus.Archived);
+                    File.Copy(sourceFilePath, destinationFilePath, true);
+                    _repository.SetCallArchivingStatusToDatabse(callEvent, destinationFilePath, ArchivingStatus.Archived);
                     _logger.LogInformation("Recording copied to archive: {SourceFilePath} -> {DestinationFilePath}", sourceFilePath, destinationFilePath);
                 }
                 catch (Exception ex)
                 {
-                    string? archivingFilePath = null; 
-                    _repository.SetArchivingStatus(callEvent, archivingFilePath, ArchivingStatus.FailedToArchive);
+                    string? archivingFilePath = null;
+                    _repository.SetCallArchivingStatusToDatabse(callEvent, archivingFilePath, ArchivingStatus.FailedToArchive);
                     _logger.LogError("Error copying recording: {SourceFilePath} -> {DestinationFilePath}. Error: {ErrorMessage}", sourceFilePath, destinationFilePath, ex.Message);
                 }
             }
@@ -72,4 +72,6 @@ namespace MediaManager.RabbitMQClient
             return Path.Combine(archivePathTemplate.Replace("{CallEndTime}", date).Replace("{CallId}", callId));
         }
     }
+
 }
+

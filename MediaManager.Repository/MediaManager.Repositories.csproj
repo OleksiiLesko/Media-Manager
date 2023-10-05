@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MediaManager.Common\MediaManager.Common.csproj" />
     <ProjectReference Include="..\MediaManager.Domain\MediaManager.Domain.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,4 @@
+using MediaManager.Common;
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
@@ -57,7 +58,7 @@ namespace MediaManager.Worker
             try
             {
                 CallEvent receivedCallEvent = JsonConvert.DeserializeObject<CallEvent>(message);
-                _repository.SaveCallToDatabase(receivedCallEvent); 
+                _repository.SaveCallToDatabase(receivedCallEvent);
                 _logger.LogInformation("CallEvent saved to database:", receivedCallEvent.CallId);
                 _eventArchiver.ArchiveCallEventAsync(receivedCallEvent);
                 _logger.LogInformation("CallEvent archived:", receivedCallEvent.CallId);
@@ -69,6 +70,5 @@ namespace MediaManager.Worker
                 _logger.LogError("Error occurred while processing the message: " + ex.Message);
             }
         }
-
     }
 }
