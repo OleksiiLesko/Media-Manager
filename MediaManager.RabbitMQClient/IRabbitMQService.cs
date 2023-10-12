@@ -19,10 +19,14 @@ namespace MediaManager.RabbitMQClient
         /// <returns></returns>
         IConnection Connect();
         /// <summary>
-        /// Sends acknowledgment for a successfully processed message.
+        /// Send acknowledgment for a successfully processed message.
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="deliveryTag"></param>
         void AcknowledgeMessage(IModel channel, ulong deliveryTag);
+        /// <summary>
+        /// Send message to RabbitMQ
+        /// </summary>
+        void SendMessage(string routingKey, byte[] message);
     }
 }
