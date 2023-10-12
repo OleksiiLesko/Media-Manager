@@ -64,7 +64,26 @@ namespace MediaManager.RabbitMQClient
             channel.BasicConsume(queue: _configuration["RabbitMQ:CallEventQueue"], autoAck: false, consumer: consumer);
         }
         /// <summary>
-        /// Sends acknowledgment for a successfully processed message.
+        /// Send message to RabbitMQ
+        /// </summary>
+        public void SendMessage(string routingKey,byte[] message)
+        {
+            try
+            {
+                using (var connection = Connect())
+                using (var channel = connection.CreateModel())
+                {
+                    channel.ExchangeDeclare(exchange: _configuration["RabbitMQ:MediaEventsExchange"], type: "topic", durable: true);
+                    channel.BasicPublish(exchange: _configuration["RabbitMQ:MediaEventsExchange"], routingKey: routingKey, basicProperties: null, body: message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error occurred while sending messages to RabbitMQ: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// Send acknowledgment for a successfully processed message.
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="deliveryTag"></param>
