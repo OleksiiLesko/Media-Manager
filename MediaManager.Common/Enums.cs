@@ -35,6 +35,10 @@
         GoingToArchive = 1,
         Archived,
         FailedToArchive,
-        Deleted
+        Deleted,
+        Success,
+        Partial,
+        Failure,
+        Unknown
     }
 }
