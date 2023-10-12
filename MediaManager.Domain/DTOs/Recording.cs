@@ -1,4 +1,6 @@
 ﻿using MediaManager.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MediaManager.Domain.DTOs
 {
@@ -16,7 +18,8 @@ namespace MediaManager.Domain.DTOs
         public string RecordedFilePath { get; set; }
         public DateTime ArchivingDate { get; set; }
         public string ArchivingFilePath { get; set; }
-        public ArchivingStatus ArchivingStatus { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ArchivingStatus RecordingArchivingStatus { get; set; }
     }
 }
 
