@@ -17,6 +17,12 @@ namespace MediaManager.Repositories
         /// Sets status archiving of recording 
         /// </summary>
         /// <param name="callEvent"></param>
-        void SetCallArchivingStatusToDatabse(CallEvent callEvent, string archivingFilePath, ArchivingStatus archivingStatus);
+        void SetCallArchivingStatusToDatabse(CallEvent callEvent, List<(string?, ArchivingStatus)> recordingStatusesAndPaths);
+        /// <summary>
+        /// Gets archiving status of recordings
+        /// </summary>
+        /// <param name="callEvent"></param>
+        /// <returns></returns>
+        List<Recording> GetRecordingsArchivingStatuses(CallEvent callEvent);
     }
 }

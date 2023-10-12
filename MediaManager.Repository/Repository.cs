@@ -69,7 +69,7 @@ namespace MediaManager.Repositories
                     for (int i = 0; i < callEvent.Recordings.Count; i++)
                     {
                         var recording = callEvent.Recordings[i];
-                        valuesPlaceholder.Append($"(@CallId{i}, @RecordingId{i}, @RecorderId{i}, @StartTime{i}, @EndTime{i}, @MediaType{i}, @RecordingStatus{i}, @ArchivingStatus{i})");
+                        valuesPlaceholder.Append($"(@CallId{i}, @RecordingId{i}, @RecorderId{i}, @StartTime{i}, @EndTime{i}, @MediaType{i}, @RecordingStatus{i}, @RecordingArchivingStatus{i})");
 
                         if (i < callEvent.Recordings.Count - 1)
                         {
@@ -83,12 +83,12 @@ namespace MediaManager.Repositories
                         recordingCmd.Parameters.AddWithValue($"@EndTime{i}", recording.EndTime);
                         recordingCmd.Parameters.AddWithValue($"@MediaType{i}", recording.MediaType);
                         recordingCmd.Parameters.AddWithValue($"@RecordingStatus{i}", recording.RecordingStatus);
-                        recordingCmd.Parameters.AddWithValue($"@ArchivingStatus{i}", ArchivingStatus.GoingToArchive);
+                        recordingCmd.Parameters.AddWithValue($"@RecordingArchivingStatus{i}", ArchivingStatus.GoingToArchive);
                     }
 
                     recordingCmd.CommandText += valuesPlaceholder.ToString();
                     recordingCmd.ExecuteNonQuery();
-                    _logger.LogInformation($"Saved call event {callEvent.CallId} to the database.");
+                    _logger.LogInformation($"Saved call event CallId {callEvent.CallId} to the database.");
                 }
                 connection.Close();
             }
@@ -97,31 +97,70 @@ namespace MediaManager.Repositories
         /// Sets status archiving of recording 
         /// </summary>
         /// <param name="callEvent"></param>
-        public void SetCallArchivingStatusToDatabse(CallEvent callEvent, string archivingFilePath, ArchivingStatus archivingStatus)
-        
+        public void SetCallArchivingStatusToDatabse(CallEvent callEvent, List<(string?, ArchivingStatus)> recordingStatusesAndPaths)
         {
-
             using (var connection = new SqlConnection(CreateConnectionString()))
             {
+                connection.Open();
 
-                 connection.Open();
-
-                foreach (var recording in callEvent.Recordings)
+                for (int i = 0; i < recordingStatusesAndPaths.Count; i++)
                 {
-                    using (var recordingCmd = new SqlCommand("UPDATE Recording SET ArchivingStatus = @ArchivingStatus, ArchivingFilePath = @ArchivingFilePath, ArchivingDate = @ArchivingDate WHERE CallId = @CallId AND RecordingId = @RecordingId;", connection))
+                    var (path, status) = recordingStatusesAndPaths[i];
+                    var recording = callEvent.Recordings[i];
+
+                    using (var recordingCmd = new SqlCommand("UPDATE Recording SET ArchivingStatus = @RecordingArchivingStatus, ArchivingFilePath = @ArchivingFilePath, ArchivingDate = @ArchivingDate WHERE CallId = @CallId AND RecordingId = @RecordingId;", connection))
                     {
                         recordingCmd.Parameters.AddWithValue("@ArchivingDate", recording.EndTime);
-                        recordingCmd.Parameters.AddWithValue("@ArchivingFilePath", archivingFilePath);
-                        recordingCmd.Parameters.AddWithValue("@ArchivingStatus", archivingStatus);
+                        recordingCmd.Parameters.AddWithValue("@ArchivingFilePath", path != null ? path : DBNull.Value);
+                        recordingCmd.Parameters.AddWithValue("@RecordingArchivingStatus", status);
                         recordingCmd.Parameters.AddWithValue("@CallId", callEvent.CallId);
                         recordingCmd.Parameters.AddWithValue("@RecordingId", recording.RecordingId);
 
-                         recordingCmd.ExecuteNonQuery();
-                        _logger.LogInformation($"Updated call event archiving status of recording {recording.RecordingId} in the database.");
+                        recordingCmd.ExecuteNonQuery();
+                        _logger.LogInformation($"Updated call event archiving status of recording RecordingId {recording.RecordingId} in the database.");
                     }
                 }
 
                 connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Gets archiving status of recordings
+        /// </summary>
+        /// <param name="callId"></param>
+        /// <returns></returns>
+        public List<Recording> GetRecordingsArchivingStatuses(CallEvent callEvent)
+        {
+            using (var connection = new SqlConnection(CreateConnectionString()))
+            {
+                connection.Open();
+
+                List<Recording> uniqueRecordings = new List<Recording>();
+
+                using (var cmd = new SqlCommand("SELECT RecordingId, StartTime, MediaType, ArchivingFilePath, ArchivingStatus FROM Recording WHERE CallId = @CallId;", connection))
+                {
+                    cmd.Parameters.AddWithValue("@CallId", callEvent.CallId);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var recording = new Recording
+                            {
+                                RecordingId = (int)reader["RecordingId"],
+                                StartTime = (DateTime)reader["StartTime"],
+                                MediaType = (MediaType)Enum.Parse(typeof(MediaType), reader["MediaType"].ToString()),
+                                ArchivingFilePath = reader["ArchivingFilePath"].ToString(),
+                                RecordingArchivingStatus = (ArchivingStatus)Enum.Parse(typeof(ArchivingStatus), reader["ArchivingStatus"].ToString())
+                            };
+
+                            uniqueRecordings.Add(recording);
+                        }
+                    }
+                }
+
+                return uniqueRecordings;
             }
         }
     }
