@@ -1,4 +1,6 @@
 ﻿using MediaManager.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MediaManager.Domain.DTOs
 {
@@ -11,6 +13,7 @@ namespace MediaManager.Domain.DTOs
         public DateTime CallStartTime { get; set; }
         public DateTime CallEndTime { get; set; }
         public CallDirection CallDirection { get; set; }
+        public ArchivingStatus ArchivingStatus  { get; set; }
         public List<Recording> Recordings { get; set; }
     }
 }
