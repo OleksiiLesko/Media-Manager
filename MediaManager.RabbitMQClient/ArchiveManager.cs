@@ -3,6 +3,7 @@ using MediaManager.Domain.DTOs;
 using MediaManager.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace MediaManager.RabbitMQClient
 {
@@ -15,12 +16,12 @@ namespace MediaManager.RabbitMQClient
         private readonly ILogger<ArchiveManager> _logger;
         private readonly IRepository _repository;
 
-       /// <summary>
+        /// <summary>
         /// Initializes a new instance of the EventArchiver class.
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger,IRepository repository)
+        public ArchiveManager(IConfiguration configuration, ILogger<ArchiveManager> logger, IRepository repository)
         {
             _configuration = configuration;
             _logger = logger;
@@ -39,24 +40,32 @@ namespace MediaManager.RabbitMQClient
                 Directory.CreateDirectory(archivePath);
             }
 
+            var recordingStatusesAndPaths = new List<(string?, ArchivingStatus)>();
+
             foreach (var recording in callEvent.Recordings)
             {
-                var sourceFilePath = recording.RecordedFilePath;
-                var destinationFilePath = Path.Combine(archivePath, Path.GetFileName(sourceFilePath));
+                string? destinationFilePath = null;
+                ArchivingStatus recordingStatus;
+
                 try
                 {
-                    File.Copy(sourceFilePath, destinationFilePath, true);
-                    _repository.SetCallArchivingStatusToDatabse(callEvent, destinationFilePath, ArchivingStatus.Archived);
-                    _logger.LogInformation("Recording copied to archive: {SourceFilePath} -> {DestinationFilePath}", sourceFilePath, destinationFilePath);
+                    destinationFilePath = Path.Combine(archivePath, Path.GetFileName(recording.RecordedFilePath));
+                    File.Copy(recording.RecordedFilePath, destinationFilePath, true);
+                    recordingStatus = ArchivingStatus.Archived;
+                    _logger.LogInformation("Recording copied to archive: {SourceFilePath} -> {DestinationFilePath}", recording.RecordedFilePath, destinationFilePath);
                 }
                 catch (Exception ex)
                 {
-                    string? archivingFilePath = null;
-                    _repository.SetCallArchivingStatusToDatabse(callEvent, archivingFilePath, ArchivingStatus.FailedToArchive);
-                    _logger.LogError("Error copying recording: {SourceFilePath} -> {DestinationFilePath}. Error: {ErrorMessage}", sourceFilePath, destinationFilePath, ex.Message);
+                    destinationFilePath = null;
+                    recordingStatus = ArchivingStatus.FailedToArchive;
+                    _logger.LogError("Error copying recording: {SourceFilePath}. Error: {ErrorMessage}", recording.RecordedFilePath, ex.Message);
                 }
+
+                recordingStatusesAndPaths.Add((destinationFilePath, recordingStatus));
             }
+            _repository.SetCallArchivingStatusToDatabse(callEvent, recordingStatusesAndPaths);
         }
+
         /// <summary>
         /// Constructs the archive path for a given call event based on the configuration settings and call event details.
         /// </summary>
