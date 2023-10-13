@@ -24,8 +24,9 @@ namespace MediaManager.Tests
         {
             _configuration.Setup(c => c["ArchiveEventsPath"]).Returns("test-archive-path");
 
-            _repositoryMock.Setup(r => r.SetArchivingStatus(It.IsAny<CallEvent>(), It.IsAny<string>(), It.IsAny<ArchivingStatus>()));
-
+            _repositoryMock.Setup(r => r.SetCallArchivingStatusToDatabse(
+             It.IsAny<CallEvent>(),
+             It.IsAny<List<(string?, ArchivingStatus)>>()));
             var callEvent = new CallEvent
             {
                 CallId = 1,
@@ -44,14 +45,20 @@ namespace MediaManager.Tests
 
             await archiveManager.ArchiveCallEventAsync(callEvent);
 
-            _repositoryMock.Verify(r => r.SetArchivingStatus(callEvent, It.IsAny<string>(), ArchivingStatus.Archived), Times.Once);
+            _repositoryMock.Verify(r => r.SetCallArchivingStatusToDatabse(callEvent,
+             It.IsAny<List<(string?, ArchivingStatus)>>()), Times.Once);
         }
         [Fact]
         public async Task ArchiveCallEventAsync_HandlesExceptionAndSetsFailedArchivingStatus()
         {
             _configuration.Setup(c => c["ArchiveEventsPath"]).Returns("test-archive-path");
 
-            _repositoryMock.Setup(r => r.SetArchivingStatus(It.IsAny<CallEvent>(), It.IsAny<string>(), ArchivingStatus.FailedToArchive));
+            _repositoryMock.Setup(r => r.SetCallArchivingStatusToDatabse(
+                It.IsAny<CallEvent>(),
+                It.Is<List<(string?, ArchivingStatus)>>(recordingStatuses =>
+                    recordingStatuses.Any(status => status.Item2 == ArchivingStatus.FailedToArchive) 
+                )
+            ));
 
             var callEvent = new CallEvent
             {
@@ -59,19 +66,21 @@ namespace MediaManager.Tests
                 CallStartTime = DateTime.UtcNow,
                 CallEndTime = DateTime.UtcNow,
                 Recordings = new List<Recording>
-                {
-                    new Recording
-                    {
-                        RecordedFilePath = "invalid-destination-path"
-                    }
-                }
+        {
+            new Recording
+            {
+                RecordedFilePath = "invalid-destination-path"
+            }
+        }
             };
 
             var archiveManager = new ArchiveManager(_configuration.Object, _loggerMock.Object, _repositoryMock.Object);
 
             await archiveManager.ArchiveCallEventAsync(callEvent);
 
-            _repositoryMock.Verify(r => r.SetArchivingStatus(callEvent, It.IsAny<string>(), ArchivingStatus.FailedToArchive), Times.Once);
+            _repositoryMock.Verify(r => r.SetCallArchivingStatusToDatabse(
+             It.IsAny<CallEvent>(),
+             It.IsAny<List<(string?, ArchivingStatus)>>()), Times.Once);
         }
     }
 }
