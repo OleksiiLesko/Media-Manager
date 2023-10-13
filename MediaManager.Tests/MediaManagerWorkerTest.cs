@@ -55,11 +55,11 @@ namespace MediaManager.Tests
                                 capturedHandler = handler;
                             });
 
-           await worker.StartAsync(stoppingToken);
+            await worker.StartAsync(stoppingToken);
 
             capturedHandler?.Invoke(jsonMessage, 1);
 
             _rabbitMQServiceMock.Verify(x => x.ReceiveMessage(It.IsAny<IModel>(), It.IsAny<Action<string, ulong>>()), Times.Once);
         }
     }
-}  
+}

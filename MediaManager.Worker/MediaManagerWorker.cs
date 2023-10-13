@@ -100,6 +100,7 @@ namespace MediaManager.Worker
         /// <returns></returns>
         private byte[] BuildArchivingEvent(CallEvent receivedCallEvent)
         {
+            //ToDo DTO ArchiveEvent 
             var callInfo = new
             {
                 CallId = receivedCallEvent.CallId,
