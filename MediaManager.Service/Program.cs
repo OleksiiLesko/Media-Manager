@@ -1,3 +1,4 @@
+using MediaManager.ArchivingEventManager;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
 using MediaManager.Worker;
@@ -80,8 +81,9 @@ namespace MediaManager.Service
                  {
                      services.AddHostedService<MediaManagerWorker>();
                      services.AddSingleton<IRabbitMQService, RabbitMQService>();
-                     services.AddSingleton<IArchiveManager, ArchiveManager>();
+                     services.AddSingleton<IFileManager, FileManager>();
                      services.AddSingleton<IRepository, Repository>();
+                     services.AddSingleton<IArchivingManager, ArchivingManager>();
                  })
                 .UseSerilog();
         }
