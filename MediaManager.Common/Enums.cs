@@ -38,6 +38,7 @@
         Deleted,
         Success,
         Partial,
-        Failure
+        Failure,
+        Unknown
     }
 }
