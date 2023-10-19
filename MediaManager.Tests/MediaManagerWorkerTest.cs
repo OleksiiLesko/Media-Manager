@@ -20,6 +20,7 @@ namespace MediaManager.Tests
         private readonly Mock<IArchivingManager> _eventArchiverMock;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CallEvent _callEvent;
+        private readonly Mock<IRepository> _repositoryMock;
         public MediaManagerWorkerTest()
         {
             _loggerMock = new Mock<ILogger<MediaManagerWorker>>();
@@ -29,6 +30,7 @@ namespace MediaManager.Tests
             _eventArchiverMock = new Mock<IArchivingManager>();
             _cancellationTokenSource = new CancellationTokenSource();
             _callEvent = new CallEvent();
+            _repositoryMock = new Mock<IRepository>();
         }
         [Fact]
         public async Task ExecuteAsync_Should_Recieve_Message()
@@ -38,7 +40,7 @@ namespace MediaManager.Tests
             _rabbitMQServiceMock.Setup(x => x.Connect()).Returns(_rabbitConnectionMock.Object);
             _rabbitConnectionMock.Setup(x => x.CreateModel()).Returns(_rabbitChannelMock.Object);
 
-            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object);
+            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object, _repositoryMock.Object);
 
             var jsonMessage = JsonConvert.SerializeObject(_callEvent);
             var messageBody = Encoding.UTF8.GetBytes(jsonMessage);
