@@ -8,12 +8,12 @@ using Moq;
 
 namespace MediaManager.Tests
 {
-    public class ArchiveManagerTest
+    public class FileManagerTest
     {
         readonly Mock<IConfiguration> _configuration;
         private readonly Mock<ILogger<RabbitMQClient.FileManager>> _loggerMock;
         private readonly Mock<IRepository> _repositoryMock;
-        public ArchiveManagerTest()
+        public FileManagerTest()
         {
             _configuration = new Mock<IConfiguration>();
             _loggerMock = new Mock<ILogger<RabbitMQClient.FileManager>>();
