@@ -1,5 +1,8 @@
 ﻿namespace MediaManager.Domain.DTOs
 {
+    /// <summary>
+    /// Archiving event for recording.
+    /// </summary>
     public class RecordingArchivingEvent
     {
         public int RecordingId { get; set; }
