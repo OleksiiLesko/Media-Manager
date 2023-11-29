@@ -1,7 +1,9 @@
 using MediaManager.ArchivingEventManager;
+using MediaManager.ArchivingRuleManager;
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -15,24 +17,31 @@ namespace MediaManager.Worker
     public class MediaManagerWorker : BackgroundService
     {
         private readonly IRabbitMQService _rabbitMQService;
-        private readonly ILogger<MediaManagerWorker> _logger;
+        private readonly ILogger<MediaManagerWorker> _workerLogger;
         private readonly IConnection _rabbitConnection;
         private readonly IModel _rabbitChannel;
         private readonly IArchivingManager _archiveEventManager;
         private readonly IRepository _repository;
+        private readonly ArchivingRuleManagerService _archivingRuleManager;
+
 
         /// <summary>
         /// Initializes a new instance of the MediaManagerWorker
         /// </summary>
-        /// <param name="logger"></param>
-        public MediaManagerWorker(ILogger<MediaManagerWorker> logger, IRabbitMQService rabbitMQService, IArchivingManager archivingEventManager, IRepository repository)
+        /// <param name="workerLogger"></param>
+        public MediaManagerWorker(ILogger<MediaManagerWorker> workerLogger,
+             IRabbitMQService rabbitMQService,
+             IArchivingManager archivingEventManager,
+             IRepository repository,
+             ArchivingRuleManagerService archivingRuleManager)
         {
-            _logger = logger;
+            _workerLogger = workerLogger;
             _rabbitMQService = rabbitMQService;
             _rabbitConnection = _rabbitMQService.Connect();
             _rabbitChannel = _rabbitConnection.CreateModel();
             _archiveEventManager = archivingEventManager;
             _repository = repository;
+            _archivingRuleManager = archivingRuleManager;
         }
         /// <summary>
         /// Executes the media management task asynchronously.
@@ -57,19 +66,23 @@ namespace MediaManager.Worker
         {
             try
             {
-                CallEvent receivedCallEvent = JsonConvert.DeserializeObject<CallEvent>(message);
+                CallEvent? receivedCallEvent = JsonConvert.DeserializeObject<CallEvent>(message);
 
-                _repository.SaveCallToDatabase(receivedCallEvent);
-                _logger.LogInformation($"CallEvent saved to database: CallId {receivedCallEvent.CallId}");
+                var filteredCall = _archivingRuleManager.ApplyRules(receivedCallEvent);
+                _workerLogger.LogInformation($"Applied rules for call: CallId {filteredCall.CallId}");
 
-                var archivingEvent = _archiveEventManager.HandleArchivingEvent(receivedCallEvent);
+                _repository.SaveCallToDatabase(filteredCall);
+                _workerLogger.LogInformation($"Call saved to database: CallId {filteredCall.CallId}");
+
+                _archiveEventManager.HandleArchivingEvent(filteredCall);
+                _workerLogger.LogInformation($"Handled archiving event: CallId {filteredCall.CallId}");
 
                 _rabbitMQService.AcknowledgeMessage(_rabbitChannel, deliveryTag);
-                _logger.LogInformation("Received a message: {@CallEvent}", receivedCallEvent);
+                _workerLogger.LogInformation("Received a message: {@RuleManagedCall}", filteredCall);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error occurred while processing the message: " + ex.Message);
+                _workerLogger.LogError("Error occurred while processing the message: " + ex.Message);
             }
         }
     }
