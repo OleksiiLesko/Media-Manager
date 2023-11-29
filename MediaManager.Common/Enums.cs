@@ -1,6 +1,13 @@
 ﻿namespace MediaManager.Common
 {
     /// <summary>
+    ///  Enumeration rules for call
+    /// </summary>
+    public enum Rules
+    {
+        MediaTypeArchivingRule
+    }
+    /// <summary>
     /// Enumeration for call event directions
     /// </summary>
     public enum CallDirection
@@ -23,8 +30,8 @@
     /// </summary>
     public enum RecordingStatus
     {
-        None = 1, 
-        Recorded, 
+        None = 1,
+        Recorded,
         NotRecorded
     }
     /// <summary>
