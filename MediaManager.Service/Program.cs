@@ -1,4 +1,6 @@
 using MediaManager.ArchivingEventManager;
+using MediaManager.ArchivingRuleManager;
+using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
 using MediaManager.Worker;
@@ -77,15 +79,18 @@ namespace MediaManager.Service
                     config.SetBasePath(Directory.GetCurrentDirectory());
                     config.AddJsonFile("appsettings.json", optional: true);
                 })
-                 .ConfigureServices(services =>
-                 {
-                     services.AddHostedService<MediaManagerWorker>();
-                     services.AddSingleton<IRabbitMQService, RabbitMQService>();
-                     services.AddSingleton<IFileManager, FileManager>();
-                     services.AddSingleton<IRepository, Repository>();
-                     services.AddSingleton<IArchivingManager, ArchivingManager>();
-                 })
-                .UseSerilog();
+                  .ConfigureServices((hostContext, services) =>
+                  {
+                      var configuration = hostContext.Configuration;
+                      services.AddHostedService<MediaManagerWorker>();
+                      services.AddSingleton<IRabbitMQService, RabbitMQService>();
+                      services.AddSingleton<IFileManager, FileManager>();
+                      services.AddSingleton<IRepository, Repository>();
+                      services.AddSingleton<IArchivingManager, ArchivingManager>();
+                      services.AddSingleton<ArchivingRuleManagerService>();
+                      services.AddSingleton<List<IArchivingRule>>();
+                      services.Configure<RulesSettings>(configuration.GetSection("Rules"));
+                  }).UseSerilog();
         }
     }
 }
