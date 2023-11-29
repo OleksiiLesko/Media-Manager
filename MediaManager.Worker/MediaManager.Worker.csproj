@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MediaManager.ArchivingManager\MediaManager.ArchivingManager.csproj" />
+    <ProjectReference Include="..\MediaManager.ArchivingRuleManager\MediaManager.ArchivingRuleManager.csproj" />
     <ProjectReference Include="..\MediaManager.RabbitMQClient\MediaManager.RabbitMQClient.csproj" />
     <ProjectReference Include="..\MediaManager.Repository\MediaManager.Repositories.csproj" />
   </ItemGroup>
