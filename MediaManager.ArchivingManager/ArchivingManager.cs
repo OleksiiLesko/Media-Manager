@@ -5,6 +5,7 @@ using MediaManager.Repositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace MediaManager.ArchivingEventManager
 {
@@ -18,11 +19,16 @@ namespace MediaManager.ArchivingEventManager
         private readonly IRepository _repository;
         private readonly IRabbitMQService _rabbitMQService;
 
+
         /// <summary>
         /// Initializes a new instance of the MediaManagerWorker
         /// </summary>
         /// <param name="logger"></param>
-        public ArchivingManager(ILogger<ArchivingManager> logger, IFileManager eventArchiver, IRepository repository, IRabbitMQService rabbitMQService)
+        public ArchivingManager(ILogger<ArchivingManager> logger,
+            IFileManager eventArchiver,
+            IRepository repository,
+            IRabbitMQService rabbitMQService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _fileManager = eventArchiver;
