@@ -42,7 +42,6 @@ namespace MediaManager.ArchivingRuleManager
             foreach (var mediaType in _mediaTypeArchivingRule.MediaTypes)
             {
                 _mediaTypes.Add(mediaType);
-                _logger.LogInformation($"Recieved media type: {mediaType.ToString()} for MediaTypeRule");
             }
             return _mediaTypes;
         }
