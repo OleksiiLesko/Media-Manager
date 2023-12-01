@@ -27,8 +27,7 @@ namespace MediaManager.ArchivingEventManager
         public ArchivingManager(ILogger<ArchivingManager> logger,
             IFileManager eventArchiver,
             IRepository repository,
-            IRabbitMQService rabbitMQService,
-            IConfiguration configuration)
+            IRabbitMQService rabbitMQService)
         {
             _logger = logger;
             _fileManager = eventArchiver;
