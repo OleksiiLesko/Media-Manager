@@ -1,9 +1,12 @@
 using MediaManager.ArchivingEventManager;
+using MediaManager.ArchivingRuleManager;
+using MediaManager.Common;
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
 using MediaManager.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -21,6 +24,10 @@ namespace MediaManager.Tests
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CallEvent _callEvent;
         private readonly Mock<IRepository> _repositoryMock;
+        private readonly Mock<IOptionsMonitor<RulesSettings>> _rulesSettingsMock;
+        private readonly Mock<ILogger<ArchivingRuleManagerService>> _loggerArchivingRuleManagerMock;
+        private readonly Mock<ILoggerFactory> _loggerFactoryMock;
+        private readonly ArchivingRuleManagerService _archivingRuleManager;
         public MediaManagerWorkerTest()
         {
             _loggerMock = new Mock<ILogger<MediaManagerWorker>>();
@@ -29,8 +36,24 @@ namespace MediaManager.Tests
             _rabbitChannelMock = new Mock<IModel>();
             _eventArchiverMock = new Mock<IArchivingManager>();
             _cancellationTokenSource = new CancellationTokenSource();
-            _callEvent = new CallEvent();
             _repositoryMock = new Mock<IRepository>();
+            _callEvent = new CallEvent();
+            _loggerArchivingRuleManagerMock = new Mock<ILogger<ArchivingRuleManagerService>>();
+            _rulesSettingsMock = new Mock<IOptionsMonitor<RulesSettings>>();
+            var rulesSettingsInstance = new RulesSettings
+            {
+                MediaTypeArchivingRule = new MediaTypeArchivingRule
+                {
+                    Enabled = true,
+                    MediaTypes = new List<MediaType> { MediaType.Voice }
+                }
+            };
+            _rulesSettingsMock.Setup(x => x.CurrentValue).Returns(rulesSettingsInstance);
+            _loggerFactoryMock = new Mock<ILoggerFactory>();
+            _archivingRuleManager = new ArchivingRuleManagerService(
+                _loggerArchivingRuleManagerMock.Object, 
+                _rulesSettingsMock.Object,
+                _loggerFactoryMock.Object);
         }
         [Fact]
         public async Task ExecuteAsync_Should_Recieve_Message()
@@ -40,7 +63,7 @@ namespace MediaManager.Tests
             _rabbitMQServiceMock.Setup(x => x.Connect()).Returns(_rabbitConnectionMock.Object);
             _rabbitConnectionMock.Setup(x => x.CreateModel()).Returns(_rabbitChannelMock.Object);
 
-            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object, _repositoryMock.Object);
+            var worker = new MediaManagerWorker(_loggerMock.Object, _rabbitMQServiceMock.Object, _eventArchiverMock.Object, _repositoryMock.Object, _archivingRuleManager);
 
             var jsonMessage = JsonConvert.SerializeObject(_callEvent);
             var messageBody = Encoding.UTF8.GetBytes(jsonMessage);
