@@ -12,19 +12,18 @@ namespace MediaManager.ArchivingRuleManager
     public class ArchivingRuleManagerService
     {
         private readonly ILogger<ArchivingRuleManagerService> _logger;
-        private readonly IOptionsMonitor<RulesSettings> _rulesSettings;
+        private readonly RulesSettings _rulesSettings;
         private List<IArchivingRule> _enabledRules = new List<IArchivingRule>();
 
         public ArchivingRuleManagerService(
               ILogger<ArchivingRuleManagerService> logger,
               IOptionsMonitor<RulesSettings> rulesSettings,
-              List<IArchivingRule> enabledRules,
               ILoggerFactory loggerFactory)
         {
             _logger = logger;
-            _rulesSettings = rulesSettings;
+            _rulesSettings = rulesSettings.CurrentValue;
             _enabledRules = GetEnabledRules(loggerFactory);
-            _rulesSettings.OnChange(settings =>
+            rulesSettings.OnChange(settings =>
             {
                 _enabledRules.Clear();
                 _enabledRules = GetEnabledRules(loggerFactory);
@@ -118,11 +117,11 @@ namespace MediaManager.ArchivingRuleManager
         /// <returns></returns>
         private List<IArchivingRule> GetEnabledRules(ILoggerFactory loggerFactory)
         {
-            if (_rulesSettings.CurrentValue.MediaTypeArchivingRule.Enabled)
+            if (_rulesSettings.MediaTypeArchivingRule.Enabled)
             {
                 var mediaTypeRule = new MediaTypeRule(
                     loggerFactory.CreateLogger<MediaTypeRule>(),
-                    _rulesSettings.CurrentValue.MediaTypeArchivingRule);
+                    _rulesSettings.MediaTypeArchivingRule);
                 _enabledRules.Add(mediaTypeRule);
             }
             return _enabledRules;
