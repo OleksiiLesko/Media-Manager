@@ -88,7 +88,7 @@ namespace MediaManager.ArchivingRuleManager
         private List<Recording> FilterRecordingsById(CallEvent receivedCallEvent, List<int> suitableRecordingsIds)
         {
             var filteredRecordings = receivedCallEvent.Recordings
-               .Where(recording => suitableRecordingsIds.All(id => id == recording.RecordingId))
+               .Where(recording => suitableRecordingsIds.Any(id => id == recording.RecordingId))
                .ToList();
             return filteredRecordings;
         }
