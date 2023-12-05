@@ -29,7 +29,7 @@ namespace MediaManager.ArchivingRuleManager
         public List<int> ApplyRule(List<Recording> recordings)
         {
             return recordings
-                 .Where(recording => _mediaTypes.All(mediaType => recording.MediaType == mediaType))
+                 .Where(recording => _mediaTypes.Any(mediaType => recording.MediaType == mediaType))
                  .Select(recording => recording.RecordingId)
                  .ToList();
         }
