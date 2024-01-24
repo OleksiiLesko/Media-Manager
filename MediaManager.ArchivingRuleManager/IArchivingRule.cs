@@ -12,10 +12,14 @@ namespace MediaManager.ArchivingRuleManager
         /// </summary>
         int Priority { get; }
         /// <summary>
+        /// 
+        /// </summary>
+        bool StopOnFailure { get; set; }
+        /// <summary>
         /// Applies rule for call recordings.
         /// </summary>
         /// <param name="callEvent"></param>
         /// <returns></returns>
-        List<int> ApplyRule(List<Recording> recordings);
+        HashSet<int> ApplyRule(CallEvent callEvent);
     }
 }
