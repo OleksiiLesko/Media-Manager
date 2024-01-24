@@ -6,5 +6,6 @@
     public class RulesSettings
     {
         public MediaTypeArchivingRule MediaTypeArchivingRule { get; set; }
+        public CallDirectionArchivingRule CallDirectionArchivingRule { get; set; }
     }
 }
