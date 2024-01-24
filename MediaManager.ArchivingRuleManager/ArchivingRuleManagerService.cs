@@ -39,9 +39,19 @@ namespace MediaManager.ArchivingRuleManager
             try
             {
                 var filteredRecordingIds = ApplyRulesInOrder(receivedCallEvent);
+                if (filteredRecordingIds.Count == 0)
+                {
+                    _logger.LogError($"Filtered recording ids are null for call: {receivedCallEvent.CallId}");
+                    return null;
+                }
                 _logger.LogInformation($"Applied rules in the order listed for call: {receivedCallEvent.CallId}");
 
                 var filteredRecordings = FilterRecordingsById(receivedCallEvent, filteredRecordingIds);
+                if (filteredRecordings.Count == 0)
+                {
+                    _logger.LogError($"Filtered recordings are null for call: {receivedCallEvent.CallId}");
+                    return null;
+                }
                 _logger.LogInformation($"Filtered recordings by id for call: {receivedCallEvent.CallId}");
 
                 var ruleManagedCall = CreateFilteredCall(receivedCallEvent, filteredRecordings);
@@ -61,22 +71,27 @@ namespace MediaManager.ArchivingRuleManager
         /// <param name="callEvent"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        private List<int>? ApplyRulesInOrder(CallEvent callEvent)
+        private HashSet<int> ApplyRulesInOrder(CallEvent callEvent)
         {
-
-            List<int> filteredRecordingIdsByRule = new List<int>();
+            HashSet<int> filteredRecordingIdsByRule = new HashSet<int>();
 
             foreach (var rule in _enabledRules.OrderBy(r => r.Priority))
             {
                 if (callEvent.Recordings.Count > 0)
                 {
-                    filteredRecordingIdsByRule.AddRange(rule.ApplyRule(callEvent.Recordings));
-                }
-                else
-                {
-                    return null;
+                    var recordingIds = rule.ApplyRule(callEvent);
+                    if (recordingIds.Count == 0 && rule.StopOnFailure)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        filteredRecordingIdsByRule.UnionWith(recordingIds);
+                        continue;
+                    }
                 }
             }
+
             return filteredRecordingIdsByRule;
         }
         /// <summary>
@@ -85,7 +100,7 @@ namespace MediaManager.ArchivingRuleManager
         /// <param name="receivedCallEvent"></param>
         /// <param name="suitableRecordingsIds"></param>
         /// <returns></returns>
-        private List<Recording> FilterRecordingsById(CallEvent receivedCallEvent, List<int> suitableRecordingsIds)
+        private List<Recording> FilterRecordingsById(CallEvent receivedCallEvent, HashSet<int> suitableRecordingsIds)
         {
             var filteredRecordings = receivedCallEvent.Recordings
                .Where(recording => suitableRecordingsIds.Any(id => id == recording.RecordingId))
@@ -123,6 +138,13 @@ namespace MediaManager.ArchivingRuleManager
                     loggerFactory.CreateLogger<MediaTypeRule>(),
                     _rulesSettings.MediaTypeArchivingRule);
                 _enabledRules.Add(mediaTypeRule);
+            }
+            if (_rulesSettings.CallDirectionArchivingRule.Enabled)
+            {
+                var callDirection = new CallDirectionRule(
+                    loggerFactory.CreateLogger<CallDirectionRule>(),
+                    _rulesSettings.CallDirectionArchivingRule);
+                _enabledRules.Add(callDirection);
             }
             return _enabledRules;
         }
