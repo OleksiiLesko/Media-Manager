@@ -12,7 +12,8 @@ namespace MediaManager.ArchivingRuleManager
         private readonly ILogger<MediaTypeRule> _logger;
         private readonly MediaTypeArchivingRule _mediaTypeArchivingRule;
         private List<MediaType> _mediaTypes = new List<MediaType>();
-        public int Priority => 1;
+        public int Priority => 2;
+        public bool StopOnFailure { get; set; }
 
         public MediaTypeRule(ILogger<MediaTypeRule>  logger,
             MediaTypeArchivingRule mediaTypeArchivingRule)
@@ -22,16 +23,16 @@ namespace MediaManager.ArchivingRuleManager
             _mediaTypes = GetMediaTypes();
         }
         /// <summary>
-        ///  Applies rule for call recordings.
+        ///  Applies rule for call recordings by medeia type.
         /// </summary>
         /// <param name="recordings"></param>
         /// <returns></returns>
-        public List<int> ApplyRule(List<Recording> recordings)
+        public HashSet<int> ApplyRule(CallEvent callEvent)
         {
-            return recordings
-                 .Where(recording => _mediaTypes.Any(mediaType => recording.MediaType == mediaType))
-                 .Select(recording => recording.RecordingId)
-                 .ToList();
+            return new HashSet<int>(
+                callEvent.Recordings
+                    .Where(recording => _mediaTypes.Any(mediaType => recording.MediaType == mediaType))
+                    .Select(recording => recording.RecordingId));
         }
         /// <summary>
         /// Gets media types from configuration.
@@ -42,6 +43,7 @@ namespace MediaManager.ArchivingRuleManager
             foreach (var mediaType in _mediaTypeArchivingRule.MediaTypes)
             {
                 _mediaTypes.Add(mediaType);
+                _logger.LogInformation($"Gets media type {mediaType} from configuration ");
             }
             return _mediaTypes;
         }
