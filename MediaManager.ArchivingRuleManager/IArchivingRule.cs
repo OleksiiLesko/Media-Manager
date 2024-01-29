@@ -12,7 +12,7 @@ namespace MediaManager.ArchivingRuleManager
         /// </summary>
         int Priority { get; }
         /// <summary>
-        /// 
+        /// Priority of the rule.
         /// </summary>
         bool StopOnFailure { get; set; }
         /// <summary>
