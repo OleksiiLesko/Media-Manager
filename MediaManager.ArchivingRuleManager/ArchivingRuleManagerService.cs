@@ -77,6 +77,7 @@ namespace MediaManager.ArchivingRuleManager
 
             foreach (var rule in _enabledRules.OrderBy(r => r.Priority))
             {
+                rule.StopOnFailure = GetStatusStopOrContinueRule(rule);
                 if (callEvent.Recordings.Count > 0)
                 {
                     var recordingIds = rule.ApplyRule(callEvent);
@@ -147,6 +148,30 @@ namespace MediaManager.ArchivingRuleManager
                 _enabledRules.Add(callDirection);
             }
             return _enabledRules;
+        }
+        /// <summary>
+        /// Gets status stop or continue rule after fail.
+        /// </summary>
+        /// <returns></returns>
+        private bool GetStatusStopOrContinueRule(IArchivingRule rule)
+        {
+            bool stopOnFailureValue;
+
+            if (rule is CallDirectionRule callDirectionRule && _rulesSettings.CallDirectionArchivingRule.StopOnFailure)
+            {
+                stopOnFailureValue = true;
+            }
+            else if (rule is MediaTypeRule mediaTypeRule && _rulesSettings.MediaTypeArchivingRule.StopOnFailure)
+            {
+                stopOnFailureValue = true;
+            }
+            else
+            {
+                stopOnFailureValue = false;
+            }
+
+            rule.StopOnFailure = stopOnFailureValue;
+            return stopOnFailureValue;
         }
     }
 }
