@@ -16,24 +16,45 @@ namespace MediaManager.Tests
             _mediaTypeArchivingRule = new MediaTypeArchivingRule
             {
                 Enabled = true,
+                StopOnFailure = false,
                 MediaTypes = new List<MediaType> { MediaType.Voice }
             };
         }
         [Fact]
-        public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenMediaTypesMatch()
+        public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenMediaTypesCorrect()
         {
-
             var mediaTypeRule = new MediaTypeRule(_loggerMock.Object, _mediaTypeArchivingRule);
 
-            var recordings = new List<Recording>
-        {
-            new Recording { RecordingId = 1, MediaType = MediaType.Voice },
-            new Recording { RecordingId = 2, MediaType = MediaType.Screen },
-            new Recording { RecordingId = 3, MediaType = MediaType.Voice }
-        };
-            var result = mediaTypeRule.ApplyRule(recordings);
+            var callEvent = new CallEvent
+            {
+                CallId = 1,
+                Recordings = new List<Recording>
+            {
+                    new Recording { RecordingId = 1, MediaType = MediaType.Voice },
+                    new Recording { RecordingId = 2, MediaType = MediaType.Voice },
+                    new Recording { RecordingId = 3, MediaType = MediaType.Screen }
+            }
+            };
 
-            Assert.Equal(new List<int> { 1, 3 }, result);
+            var result = mediaTypeRule.ApplyRule(callEvent);
+            Assert.Equal(new HashSet<int> { 1, 2 }, result);
+        }
+        [Fact]
+        public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenMediaTypesNotCorrect()
+        {
+            var mediaTypeRule = new MediaTypeRule(_loggerMock.Object, _mediaTypeArchivingRule);
+
+            var callEvent = new CallEvent
+            {
+                CallId = 1,
+                Recordings = new List<Recording>
+            {
+                    new Recording { RecordingId = 1, MediaType = MediaType.Screen }
+            }
+            };
+
+            var result = mediaTypeRule.ApplyRule(callEvent);
+            Assert.Equal(new HashSet<int> { }, result);
         }
     }
 }
