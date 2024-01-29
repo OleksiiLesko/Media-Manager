@@ -14,6 +14,7 @@ namespace MediaManager.ArchivingRuleManager
         private List<CallDirection> _callDirections = new List<CallDirection>();
         public int Priority => 1;
         public bool StopOnFailure { get; set; }
+
         public CallDirectionRule(ILogger<CallDirectionRule> logger, CallDirectionArchivingRule callDirectionArchivingRule)
         {
             _logger = logger;
@@ -46,8 +47,6 @@ namespace MediaManager.ArchivingRuleManager
             foreach (var callDirection in _callDirectionArchivingRule.CallDirections)
             {
                 _callDirections.Add(callDirection);
-                _logger.LogInformation($"Gets call direction {callDirection} from configuration ");
-
             }
             return _callDirections;
         }
