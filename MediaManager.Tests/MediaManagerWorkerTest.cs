@@ -45,7 +45,14 @@ namespace MediaManager.Tests
                 MediaTypeArchivingRule = new MediaTypeArchivingRule
                 {
                     Enabled = true,
+                    StopOnFailure = false,
                     MediaTypes = new List<MediaType> { MediaType.Voice }
+                },
+                CallDirectionArchivingRule = new CallDirectionArchivingRule
+                {
+                    Enabled = true,
+                    StopOnFailure = false,
+                    CallDirections = new List<CallDirection> { CallDirection.Incoming }
                 }
             };
             _rulesSettingsMock.Setup(x => x.CurrentValue).Returns(rulesSettingsInstance);
