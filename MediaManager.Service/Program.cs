@@ -1,5 +1,6 @@
 using MediaManager.ArchivingEventManager;
 using MediaManager.ArchivingRuleManager;
+using MediaManager.Common;
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
@@ -23,6 +24,8 @@ namespace MediaManager.Service
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+
+
             var pathToContentRoot = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Directory.SetCurrentDirectory(pathToContentRoot!);
             try
@@ -87,9 +90,16 @@ namespace MediaManager.Service
                       services.AddSingleton<IFileManager, FileManager>();
                       services.AddSingleton<IRepository, Repository>();
                       services.AddSingleton<IArchivingManager, ArchivingManager>();
+                      services.AddSingleton<IOperatorFactory, OperatorFactory>();
+                      services.AddSingleton<IArchivingRuleFactory,ArchivingRuleFactory>();
                       services.AddSingleton<ArchivingRuleManagerService>();
-                      services.AddSingleton<List<IArchivingRule>>();
-                      services.Configure<RulesSettings>(configuration.GetSection("Rules"));
+                      services.Configure<MediaTypeRuleConfig>(configuration.GetSection("Rules:MediaTypeRuleConfig"));
+                      services.Configure<CallDirectionRuleConfig>(configuration.GetSection("Rules:CallDirectionRuleConfig"));
+                      services.Configure<CallDurationRuleConfig>(configuration.GetSection("Rules:CallDurationRuleConfig"));
+                      services.PostConfigure<CallDurationRuleConfig>(config =>
+                      {
+                          config.ParsedComparisonOperator = ComparisonOperatorSettings.ParseComparisonOperator(config.ComparisonOperator);
+                      });
                   }).UseSerilog();
         }
     }
