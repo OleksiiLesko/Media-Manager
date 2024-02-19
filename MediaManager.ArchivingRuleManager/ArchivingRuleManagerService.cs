@@ -1,8 +1,6 @@
 ﻿using MediaManager.Domain.DTOs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Data;
-using RulesSettings = MediaManager.Domain.DTOs.RulesSettings;
 
 namespace MediaManager.ArchivingRuleManager
 {
@@ -12,22 +10,16 @@ namespace MediaManager.ArchivingRuleManager
     public class ArchivingRuleManagerService
     {
         private readonly ILogger<ArchivingRuleManagerService> _logger;
-        private readonly RulesSettings _rulesSettings;
+        private readonly IArchivingRuleFactory _ruleFactory;
         private List<IArchivingRule> _enabledRules = new List<IArchivingRule>();
 
         public ArchivingRuleManagerService(
               ILogger<ArchivingRuleManagerService> logger,
-              IOptionsMonitor<RulesSettings> rulesSettings,
-              ILoggerFactory loggerFactory)
+              IArchivingRuleFactory ruleFactory)
         {
             _logger = logger;
-            _rulesSettings = rulesSettings.CurrentValue;
-            _enabledRules = GetEnabledRules(loggerFactory);
-            rulesSettings.OnChange(settings =>
-            {
-                _enabledRules.Clear();
-                _enabledRules = GetEnabledRules(loggerFactory);
-            });
+            _ruleFactory = ruleFactory;
+            _enabledRules = _ruleFactory.CreateAllEnabledArchivingRules();
         }
         /// <summary>
         /// Recieves managed rules call.
@@ -39,24 +31,25 @@ namespace MediaManager.ArchivingRuleManager
             try
             {
                 var filteredRecordingIds = ApplyRulesInOrder(receivedCallEvent);
+
                 if (filteredRecordingIds.Count == 0)
                 {
                     _logger.LogError($"Filtered recording ids are null for call: {receivedCallEvent.CallId}");
                     return null;
                 }
-                _logger.LogInformation($"Applied rules in the order listed for call: {receivedCallEvent.CallId}");
 
                 var filteredRecordings = FilterRecordingsById(receivedCallEvent, filteredRecordingIds);
+
                 if (filteredRecordings.Count == 0)
                 {
                     _logger.LogError($"Filtered recordings are null for call: {receivedCallEvent.CallId}");
                     return null;
                 }
+
                 _logger.LogInformation($"Filtered recordings by id for call: {receivedCallEvent.CallId}");
-
                 var ruleManagedCall = CreateFilteredCall(receivedCallEvent, filteredRecordings);
-                _logger.LogInformation($"Created rull managed call: {ruleManagedCall.CallId}");
 
+                _logger.LogInformation($"Created rull managed call: {ruleManagedCall.CallId}");
                 return ruleManagedCall;
             }
             catch (Exception ex)
@@ -77,9 +70,10 @@ namespace MediaManager.ArchivingRuleManager
 
             foreach (var rule in _enabledRules.OrderBy(r => r.Priority))
             {
-                rule.StopOnFailure = GetStatusStopOrContinueRule(rule);
                 if (callEvent.Recordings.Count > 0)
                 {
+                    _logger.LogInformation("Applying rules in order listed for call: " + callEvent.CallId);
+
                     var recordingIds = rule.ApplyRule(callEvent);
                     if (recordingIds.Count == 0 && rule.StopOnFailure)
                     {
@@ -103,9 +97,12 @@ namespace MediaManager.ArchivingRuleManager
         /// <returns></returns>
         private List<Recording> FilterRecordingsById(CallEvent receivedCallEvent, HashSet<int> suitableRecordingsIds)
         {
+            _logger.LogInformation("Filtering recordings by ID for call: " + receivedCallEvent.CallId);
+
             var filteredRecordings = receivedCallEvent.Recordings
                .Where(recording => suitableRecordingsIds.Any(id => id == recording.RecordingId))
                .ToList();
+
             return filteredRecordings;
         }
         /// <summary>
@@ -116,6 +113,8 @@ namespace MediaManager.ArchivingRuleManager
         /// <returns></returns>
         private FilteredCall CreateFilteredCall(CallEvent receivedCallEvent, List<Recording> filteredRecordings)
         {
+            _logger.LogInformation("Creating filtered call for: " + receivedCallEvent.CallId);
+
             var ruleManagedCall = new FilteredCall
             {
                 CallId = receivedCallEvent.CallId,
@@ -125,53 +124,8 @@ namespace MediaManager.ArchivingRuleManager
                 ArchivingStatus = receivedCallEvent.ArchivingStatus,
                 Recordings = filteredRecordings
             };
+
             return ruleManagedCall;
-        }
-        /// <summary>
-        /// Gets enabled rules.
-        /// </summary>
-        /// <returns></returns>
-        private List<IArchivingRule> GetEnabledRules(ILoggerFactory loggerFactory)
-        {
-            if (_rulesSettings.MediaTypeArchivingRule.Enabled)
-            {
-                var mediaTypeRule = new MediaTypeRule(
-                    loggerFactory.CreateLogger<MediaTypeRule>(),
-                    _rulesSettings.MediaTypeArchivingRule);
-                _enabledRules.Add(mediaTypeRule);
-            }
-            if (_rulesSettings.CallDirectionArchivingRule.Enabled)
-            {
-                var callDirection = new CallDirectionRule(
-                    loggerFactory.CreateLogger<CallDirectionRule>(),
-                    _rulesSettings.CallDirectionArchivingRule);
-                _enabledRules.Add(callDirection);
-            }
-            return _enabledRules;
-        }
-        /// <summary>
-        /// Gets status stop or continue rule after fail.
-        /// </summary>
-        /// <returns></returns>
-        private bool GetStatusStopOrContinueRule(IArchivingRule rule)
-        {
-            bool stopOnFailureValue;
-
-            if (rule is CallDirectionRule callDirectionRule && _rulesSettings.CallDirectionArchivingRule.StopOnFailure)
-            {
-                stopOnFailureValue = true;
-            }
-            else if (rule is MediaTypeRule mediaTypeRule && _rulesSettings.MediaTypeArchivingRule.StopOnFailure)
-            {
-                stopOnFailureValue = true;
-            }
-            else
-            {
-                stopOnFailureValue = false;
-            }
-
-            rule.StopOnFailure = stopOnFailureValue;
-            return stopOnFailureValue;
         }
     }
 }
