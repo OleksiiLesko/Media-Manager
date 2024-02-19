@@ -8,12 +8,12 @@ namespace MediaManager.Tests
 {
     public class CallDirectionRuleTest
     {
-        private readonly Mock<ILogger<CallDirectionRule>> _loggerMock;
-        private readonly CallDirectionArchivingRule _callDirectionArchivingRule;
+        private readonly Mock<ILogger<ArchivingRuleManager.CallDirectionArchivingRule>> _loggerMock;
+        private readonly Domain.DTOs.CallDirectionRuleConfig _callDirectionArchivingRule;
         public CallDirectionRuleTest()
         {
-            _loggerMock = new Mock<ILogger<CallDirectionRule>>();
-            _callDirectionArchivingRule = new CallDirectionArchivingRule
+            _loggerMock = new Mock<ILogger<ArchivingRuleManager.CallDirectionArchivingRule>>();
+            _callDirectionArchivingRule = new Domain.DTOs.CallDirectionRuleConfig
             {
                 Enabled = true,
                 StopOnFailure = false,
@@ -23,7 +23,7 @@ namespace MediaManager.Tests
         [Fact]
         public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenCallDirectionCorrect()
         {
-            var callDirectionRule = new CallDirectionRule(_loggerMock.Object, _callDirectionArchivingRule);
+            var callDirectionRule = new ArchivingRuleManager.CallDirectionArchivingRule(_loggerMock.Object, _callDirectionArchivingRule);
 
             var callEvent = new CallEvent
             {
@@ -42,7 +42,7 @@ namespace MediaManager.Tests
         [Fact]
         public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenCallDirectionNotCorrect()
         {
-            var callDirectionRule = new CallDirectionRule(_loggerMock.Object, _callDirectionArchivingRule);
+            var callDirectionRule = new ArchivingRuleManager.CallDirectionArchivingRule(_loggerMock.Object, _callDirectionArchivingRule);
 
             var callEvent = new CallEvent
             {

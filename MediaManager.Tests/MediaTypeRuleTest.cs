@@ -8,12 +8,12 @@ namespace MediaManager.Tests
 {
     public class MediaTypeRuleTest
     {
-        private readonly Mock<ILogger<MediaTypeRule>> _loggerMock;
-        private readonly MediaTypeArchivingRule _mediaTypeArchivingRule;
+        private readonly Mock<ILogger<ArchivingRuleManager.MediaTypeArchivingRule>> _loggerMock;
+        private readonly Domain.DTOs.MediaTypeRuleConfig _mediaTypeArchivingRule;
         public MediaTypeRuleTest()
         {
-            _loggerMock = new Mock<ILogger<MediaTypeRule>>();
-            _mediaTypeArchivingRule = new MediaTypeArchivingRule
+            _loggerMock = new Mock<ILogger<ArchivingRuleManager.MediaTypeArchivingRule>>();
+            _mediaTypeArchivingRule = new Domain.DTOs.MediaTypeRuleConfig
             {
                 Enabled = true,
                 StopOnFailure = false,
@@ -23,7 +23,7 @@ namespace MediaManager.Tests
         [Fact]
         public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenMediaTypesCorrect()
         {
-            var mediaTypeRule = new MediaTypeRule(_loggerMock.Object, _mediaTypeArchivingRule);
+            var mediaTypeRule = new ArchivingRuleManager.MediaTypeArchivingRule(_loggerMock.Object, _mediaTypeArchivingRule);
 
             var callEvent = new CallEvent
             {
@@ -42,7 +42,7 @@ namespace MediaManager.Tests
         [Fact]
         public void ApplyRule_ShouldReturnMatchingRecordingIds_WhenMediaTypesNotCorrect()
         {
-            var mediaTypeRule = new MediaTypeRule(_loggerMock.Object, _mediaTypeArchivingRule);
+            var mediaTypeRule = new ArchivingRuleManager.MediaTypeArchivingRule(_loggerMock.Object, _mediaTypeArchivingRule);
 
             var callEvent = new CallEvent
             {

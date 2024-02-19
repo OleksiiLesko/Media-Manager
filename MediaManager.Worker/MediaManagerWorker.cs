@@ -1,5 +1,6 @@
 using MediaManager.ArchivingEventManager;
 using MediaManager.ArchivingRuleManager;
+using MediaManager.Common;
 using MediaManager.Domain.DTOs;
 using MediaManager.RabbitMQClient;
 using MediaManager.Repositories;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using System.Text.Json;
 
 namespace MediaManager.Worker
 {
