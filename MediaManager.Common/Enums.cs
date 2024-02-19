@@ -1,11 +1,35 @@
-﻿namespace MediaManager.Common
+﻿using System.ComponentModel;
+
+namespace MediaManager.Common
 {
     /// <summary>
-    ///  Enumeration rules for call
+    /// Types of archiving rules.
     /// </summary>
-    public enum Rules
+    public enum RuleType
     {
+        CallDirectionArchivingRule,
+        CallDurationArchivingRule,
         MediaTypeArchivingRule
+    }
+    /// <summary>
+    ///  Enumeration comparison operators
+    /// </summary>
+    public enum ComparisonOperator
+    {
+        [Description("<")]
+        LessThan,
+
+        [Description("<=")]
+        LessThanOrEqual,
+
+        [Description("==")]
+        Equal,
+
+        [Description(">")]
+        GreaterThan,
+
+        [Description(">=")]
+        GreaterThanOrEqual
     }
     /// <summary>
     /// Enumeration for call event directions
