@@ -11,7 +11,7 @@ namespace MediaManager.ArchivingRuleManager
     public class CallDirectionArchivingRule : IArchivingRule
     {
         private readonly ILogger<CallDirectionArchivingRule> _logger;
-        private readonly CallDirectionRuleConfig _callDirectionRuleConfig;
+        private  CallDirectionRuleConfig _callDirectionRuleConfig;
         private List<CallDirection> _callDirections = new List<CallDirection>();
         public int Priority { get; set; }
         public bool StopOnFailure { get; set; }
@@ -32,8 +32,12 @@ namespace MediaManager.ArchivingRuleManager
 
             callDirectionRuleConfig.OnChange(settings =>
             {
+
+                _callDirectionRuleConfig = settings;
+
                 _callDirections.Clear();
                 _callDirections = GetCallDirections();
+
                 _logger.LogInformation("CallDirectionRuleConfig changed. Refreshed CallDirections.");
             });
         }
@@ -64,14 +68,11 @@ namespace MediaManager.ArchivingRuleManager
         {
             _logger.LogInformation("Getting CallDirections from configuration.");
 
-            foreach (var callDirection in _callDirectionRuleConfig.CallDirections)
-            {
-                _callDirections.Add(callDirection);
-            }
+            var callDirections = new List<CallDirection>(_callDirectionRuleConfig.CallDirections);
 
             _logger.LogInformation("CallDirections retrieved.");
 
-            return _callDirections;
+            return callDirections;
         }
     }
 }
