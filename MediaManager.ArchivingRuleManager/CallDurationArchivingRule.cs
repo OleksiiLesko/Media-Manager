@@ -12,7 +12,7 @@ namespace MediaManager.ArchivingRuleManager
     {
         private readonly ILogger<CallDurationArchivingRule> _logger;
         private readonly IOperatorFactory _operatorFactory;
-        private readonly CallDurationRuleConfig _callDurationRuleConfig;
+        private  CallDurationRuleConfig _callDurationRuleConfig;
         private int _callDurationConfig;
         private ComparisonOperator _comparisonOperatorConfig;
         public int Priority { get; set; }
@@ -37,8 +37,11 @@ namespace MediaManager.ArchivingRuleManager
 
             callDurationRuleConfig.OnChange(settings =>
             {
+                _callDurationRuleConfig = settings;
+
                 _callDurationConfig = GetCallDurationFromConfig();
                 _comparisonOperatorConfig = GetComparisonOperatorFromConfig();
+
                 _logger.LogInformation("CallDurationRuleConfig changed. Refreshed CallDuration");
             });
         }
