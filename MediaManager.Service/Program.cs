@@ -98,7 +98,7 @@ namespace MediaManager.Service
                       services.Configure<CallDurationRuleConfig>(configuration.GetSection("Rules:CallDurationRuleConfig"));
                       services.PostConfigure<CallDurationRuleConfig>(config =>
                       {
-                          config.ParsedComparisonOperator = ComparisonOperatorSettings.ParseComparisonOperator(config.ComparisonOperator);
+                          config.ParsedComparisonOperator = ComparisonOperatorParser.ParseComparisonOperator(config.ComparisonOperator);
                       });
                   }).UseSerilog();
         }
